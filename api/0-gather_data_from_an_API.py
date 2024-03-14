@@ -1,9 +1,23 @@
 #!/usr/bin/python3
+"""
+This script retrieves information about a user's TODO list progress
+from a REST API based on the provided employee ID.
+"""
+
 import requests
 import sys
 
 
 def get_employee_todo_progress(employee_id):
+    """
+    Retrieve and display information about the user's TODO list progress.
+
+    Args:
+        employee_id (int): The employee ID for which to retrieve the TODO list.
+
+    Returns:
+        None
+    """
     base_url = 'https://jsonplaceholder.typicode.com'
 
     # Get user information
@@ -20,8 +34,8 @@ def get_employee_todo_progress(employee_id):
     completed_tasks = sum(1 for todo in todos_data if todo['completed'])
 
     # Display progress
-    print(f"Employee {employee_name} is done with tasks
-          ({completed_tasks}/{total_tasks}): ")
+    print(f"Employee {employee_name} is done with tasks "
+          f"({completed_tasks}/{total_tasks}): ")
 
     # Display completed tasks
     for todo in todos_data:
