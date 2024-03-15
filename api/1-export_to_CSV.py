@@ -34,9 +34,12 @@ def get_employee_todo_progress(employee_id):
     filename = f"{employee_id}.csv"
     with open(filename, 'w', newline='') as csvfile:
         csv_writer = csv.writer(csvfile)
-        csv_writer.writerow(["USER_ID", "USERNAME", "TASK_COMPLETED_STATUS", "TASK_TITLE"])
+        csv_writer.writerow(["USER_ID", "USERNAME", "TASK_COMPLETED_STATUS",
+                            "TASK_TITLE"])
         for todo in todos_data:
-            csv_writer.writerow([employee_id, employee_name, str(todo.get('completed', False)), todo.get('title', '')])
+            csv_writer.writerow([employee_id, employee_name,
+                                str(todo.get('completed', False)),
+                                todo.get('title', '')])
     print(f"Task data exported to '{filename}' successfully.")
 
 
@@ -60,11 +63,14 @@ if __name__ == "__main__":
         print("Warning: Imported libraries are not alphabetically ordered.")
 
     # Verify correct user ID and username retrieved
-    if user_data.get('id') != employee_id or user_data.get('username') != employee_name:
+    if user_data.get('id') != employee_id or user_data.get('username')
+    != employee_name:
         print("Warning: Incorrect user ID or username retrieved.")
 
     # Ensure correct output formatting
-    if not isinstance(completed_tasks, int) or not isinstance(total_tasks, int):
-        print("Warning: Incorrect output formatting for completed_tasks or total_tasks.")
+    if not isinstance(completed_tasks, int) or
+    not isinstance(total_tasks, int):
+        print("Warning: Incorrect output formatting for
+              completed_tasks or total_tasks.")
     if not isinstance(employee_name, str):
         print("Warning: Incorrect output formatting for employee_name.")
