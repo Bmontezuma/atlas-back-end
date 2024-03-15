@@ -47,30 +47,3 @@ if __name__ == "__main__":
     if len(sys.argv) != 2:
         print("Usage: python3 1-export_to_CSV.py <employee_id>")
         sys.exit(1)
-
-    employee_id = sys.argv[1]
-    try:
-        employee_id = int(employee_id)
-    except ValueError:
-        print("Employee ID must be an integer")
-        sys.exit(1)
-
-    get_employee_todo_progress(employee_id)
-
-    # Ensure imported libraries are alphabetically ordered
-    import_order = sorted(sys.modules.keys())
-    if import_order != sorted(sys.modules.keys()):
-        print("Warning: Imported libraries are not alphabetically ordered.")
-
-    # Verify correct user ID and username retrieved
-    if user_data.get('id') != employee_id or user_data.get('username')
-    != employee_name:
-        print("Warning: Incorrect user ID or username retrieved.")
-
-    # Ensure correct output formatting
-    if not isinstance(completed_tasks, int) or
-    not isinstance(total_tasks, int):
-        print("Warning: Incorrect output formatting for
-              completed_tasks or total_tasks.")
-    if not isinstance(employee_name, str):
-        print("Warning: Incorrect output formatting for employee_name.")
