@@ -8,6 +8,7 @@ import requests
 import sys
 import csv
 
+
 def get_employee_todo_progress(employee_id):
     """
     Retrieve and display information about the user's TODO list progress.
@@ -33,10 +34,13 @@ def get_employee_todo_progress(employee_id):
     filename = f"{employee_id}.csv"
     with open(filename, 'w', newline='') as csvfile:
         csv_writer = csv.writer(csvfile)
-        csv_writer.writerow(["USER_ID", "USERNAME", "TASK_COMPLETED_STATUS", "TASK_TITLE"])
+        csv_writer.writerow(["USER_ID", "USERNAME", "TASK_COMPLETED_STATUS",
+                            "TASK_TITLE"])
         for todo in todos_data:
-            csv_writer.writerow([employee_id, employee_name, str(todo['completed']), todo['title']])
+            csv_writer.writerow([employee_id, employee_name,
+                                str(todo['completed']), todo['title']])
     print(f"Task data exported to '{filename}' successfully.")
+
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
