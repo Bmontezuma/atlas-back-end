@@ -41,8 +41,8 @@ def main():
     completed_tasks = sum(
         1 for task in employee_data['todos'] if task['completed'])
 
-    print(f"Employee {employee_data['name']} is done with tasks
-          ({completed_tasks}/{total_tasks}): ")
+    print(f"Employee {employee_data['name']} is done with
+          tasks({completed_tasks}/{total_tasks}): ")
     for task in employee_data['todos']:
         if task['completed']:
             print(f"\t{task['title']}")
