@@ -24,16 +24,29 @@ def export_to_csv(employee_id):
 
     # Get user information
     user_response = requests.get(f'{base_url}/users/{employee_id}')
+
+    # Check if the request was successful
     if user_response.status_code != 200:
-        print("User ID not found.")
-        return
+        print(f"RequestError: {user_response.status_code}")
+        sys.exit(1)
 
     user_data = user_response.json()
     employee_name = user_data.get('name', '')
 
     # Get user's todos
     todos_response = requests.get(f'{base_url}/todos?userId={employee_id}')
+
+    # Check if the request was successful
+    if todos_response.status_code != 200:
+        print(f"RequestError: {todos_response.status_code}")
+        sys.exit(1)
+
     todos_data = todos_response.json()
+
+    # Check if tasks were found for the user ID
+    if not todos_data:
+        print("No tasks found for user ID", employee_id)
+        sys.exit(1)
 
     # Write data to CSV file
     filename = f"{employee_id}.csv"
