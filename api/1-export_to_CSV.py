@@ -1,5 +1,10 @@
 #!/usr/bin/python3
 
+"""
+This script retrieves information about a user's TODO list progress
+from a REST API based on the provided employee ID and exports it to a CSV file.
+"""
+
 import csv
 import requests
 import sys
@@ -7,7 +12,13 @@ import sys
 
 def export_to_csv(employee_id):
     """
-    Export tasks for the employee with the given ID to a CSV file.
+    Retrieve and export information about the user's TODO list progress.
+
+    Args:
+        employee_id (int): The employee ID for which to retrieve the TODO list.
+
+    Returns:
+        None
     """
     base_url = 'https://jsonplaceholder.typicode.com'
 
@@ -25,11 +36,15 @@ def export_to_csv(employee_id):
     with open(filename, 'w', newline='') as csvfile:
         csv_writer = csv.writer(csvfile)
         csv_writer.writerow(["USER_ID", "USERNAME",
-                            "TASK_COMPLETED_STATUS", "TASK_TITLE"])
+                             "TASK_COMPLETED_STATUS",
+                             "TASK_TITLE"])
         for todo in todos_data:
-            csv_writer.writerow([employee_id, employee_name,
-                                str(todo.get('completed', False)),
-                                todo.get('title', '')])
+            csv_writer.writerow([
+                employee_id,
+                employee_name,
+                str(todo.get('completed', False)),
+                todo.get('title', '')
+            ])
 
     print(f"Task data exported to '{filename}' successfully.")
 
