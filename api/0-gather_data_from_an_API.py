@@ -1,5 +1,7 @@
 #!/usr/bin/python3
-"""Script to fetch and display employee TODO list progress."""
+"""
+Script to fetch and display employee TODO list progress.
+"""
 
 import sys
 import requests
@@ -41,8 +43,8 @@ def main():
     completed_tasks = sum(
         1 for task in employee_data['todos'] if task['completed'])
 
-    print(f"Employee {employee_data['name']} is done with
-          tasks({completed_tasks}/{total_tasks}): ")
+    print(f"Employee {employee_data['name']} is done with tasks
+          ({completed_tasks}/{total_tasks}): ")
     for task in employee_data['todos']:
         if task['completed']:
             print(f"\t{task['title']}")
