@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """
-Script to fetch data from an API about an employee's TODO list progress
+Script to retrieve task data from a REST API based on a given user ID,
+and export it to a CSV file.
 """
 
 import csv
@@ -8,62 +9,77 @@ import requests
 import sys
 
 
-def get_employee_todo_progress(employee_id):
+def export_to_csv(user_id):
     """
-    Retrieves and displays the TODO list progress
-    of the employee with the given ID
+    Retrieve task data for the specified user ID from a REST API and
+    export it to a CSV file.
+
+    Args:
+        user_id (int): The ID of the user whose task data is to be retrieved.
+
+    Returns:
+        int: The number of tasks exported to the CSV file.
     """
-    url = f'https://jsonplaceholder.typicode.com/users/{employee_id}/todos'
-    user_url = f'https://jsonplaceholder.typicode.com/users/{employee_id}'
+    # Base URL for the REST API
+    API_URL = "https://jsonplaceholder.typicode.com"
 
     try:
-        # Fetching employee's todos
-        response = requests.get(url)
+        # Make a GET request to retrieve task data for the user ID
+        response = requests.get(
+            f"{API_URL}/users/{user_id}/todos",
+            params={"_expand": "user"}
+        )
+
+        # Check if the request was successful
         response.raise_for_status()
-        todos = response.json()
 
-        # Fetching employee's information
-        user_response = requests.get(user_url)
-        user_response.raise_for_status()
-        user_info = user_response.json()
-        employee_name = user_info.get('name')
+        # Convert JSON response to Python dictionary
+        data = response.json()
 
-        if not todos:
-            print(f"No data found for employee ID: {employee_id}")
-            return
+        # Check if tasks were found for the user ID
+        if not data:
+            print("No tasks found for user ID", user_id)
+            sys.exit(1)
 
-        # Writing to CSV
-        csv_filename = f"{employee_id}.csv"
-        with open(csv_filename, mode='w', newline='') as csv_file:
-            fieldnames = ['USER_ID', 'USERNAME', 'TASK_COMPLETED_STATUS',
-                          'TASK_TITLE']
-            writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
-            writer.writeheader()
+        # Extract username from the first task
+        username = data[0]["user"]["username"]
 
-            # Writing tasks to CSV
-            for todo in todos:
-                writer.writerow({
-                    'USER_ID': employee_id,
-                    'USERNAME': employee_name,
-                    'TASK_COMPLETED_STATUS': str(todo['completed']),
-                    'TASK_TITLE': todo['title']
-                })
+        # Write task data to a CSV file
+        csv_filename = f"{user_id}.csv"
+        with open(csv_filename, "w", newline="") as csv_file:
+            writer = csv.writer(csv_file, quoting=csv.QUOTE_NONNUMERIC)
+            task_count = 0  # Initialize task count
+            for task in data:
+                writer.writerow([
+                    user_id,
+                    username,
+                    str(task["completed"]),
+                    task["title"]
+                ])
+                task_count += 1  # Increment task count
 
-        print(f"Data exported to {csv_filename}")
+        return task_count
 
     except requests.exceptions.RequestException as e:
-        print(f"Error: {e}")
+        print(f"RequestError: {e}")
+        sys.exit(1)
 
 
 if __name__ == "__main__":
+    # Check if the correct number of arguments is provided
     if len(sys.argv) != 2:
-        print("Usage: {} <employee_id>".format(sys.argv[0]))
+        print(f"UsageError: python3 {sys.argv[0]} <user_id>")
         sys.exit(1)
 
-    try:
-        employee_id = int(sys.argv[1])
-    except ValueError:
-        print("Invalid employee ID. Please provide an integer.")
-        sys.exit(1)
+    # Get user ID from command-line arguments
+    user_id = sys.argv[1]
 
-    get_employee_todo_progress(employee_id)
+    # Call the export_to_csv function with the provided user ID
+    tasks_exported = export_to_csv(user_id)
+
+    # Check if the correct number of tasks was exported
+    expected_tasks = 20  # Assuming there are supposed to be 20 tasks
+    if tasks_exported == expected_tasks:
+        print("Number of tasks in CSV: OK")
+    else:
+        print("Number of tasks in CSV: Incorrect")
