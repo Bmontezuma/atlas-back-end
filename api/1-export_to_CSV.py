@@ -24,6 +24,10 @@ def export_to_csv(employee_id):
 
     # Get user information
     user_response = requests.get(f'{base_url}/users/{employee_id}')
+    if user_response.status_code != 200:
+        print("User ID not found.")
+        return
+
     user_data = user_response.json()
     employee_name = user_data.get('name', '')
 
