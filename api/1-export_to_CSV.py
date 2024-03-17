@@ -3,24 +3,26 @@
 Script to fetch data from an API about an employee's TODO list progress
 """
 
+import csv
 import requests
 import sys
-import csv
 
 
 def get_employee_todo_progress(employee_id):
     """
-    Retrieves and displays the TODO list progress of
-    the employee with the given ID
+    Retrieves and displays the TODO list progress
+    of the employee with the given ID
     """
     url = f'https://jsonplaceholder.typicode.com/users/{employee_id}/todos'
     user_url = f'https://jsonplaceholder.typicode.com/users/{employee_id}'
 
     try:
+        # Fetching employee's todos
         response = requests.get(url)
         response.raise_for_status()
         todos = response.json()
 
+        # Fetching employee's information
         user_response = requests.get(user_url)
         user_response.raise_for_status()
         user_info = user_response.json()
@@ -30,13 +32,15 @@ def get_employee_todo_progress(employee_id):
             print(f"No data found for employee ID: {employee_id}")
             return
 
+        # Writing to CSV
         csv_filename = f"{employee_id}.csv"
         with open(csv_filename, mode='w', newline='') as csv_file:
             fieldnames = ['USER_ID', 'USERNAME', 'TASK_COMPLETED_STATUS',
                           'TASK_TITLE']
             writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
-
             writer.writeheader()
+
+            # Writing tasks to CSV
             for todo in todos:
                 writer.writerow({
                     'USER_ID': employee_id,
