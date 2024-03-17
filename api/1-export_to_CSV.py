@@ -1,75 +1,65 @@
 #!/usr/bin/python3
-
 """
-This script retrieves information about a user's TODO list progress
-from a REST API based on the provided employee ID and exports it to a CSV file.
+Script to fetch data from an API about an employee's TODO list progress
 """
 
-import csv
 import requests
 import sys
+import csv
 
 
-def export_to_csv(employee_id):
+def get_employee_todo_progress(employee_id):
     """
-    Retrieve and export information about the user's TODO list progress.
-
-    Args:
-        employee_id (int): The employee ID for which to retrieve the TODO list.
-
-    Returns:
-        None
+    Retrieves and displays the TODO list progress of
+    the employee with the given ID
     """
-    base_url = 'https://jsonplaceholder.typicode.com'
+    url = f'https://jsonplaceholder.typicode.com/users/{employee_id}/todos'
+    user_url = f'https://jsonplaceholder.typicode.com/users/{employee_id}'
 
-    # Get user information
-    user_response = requests.get(f'{base_url}/users/{employee_id}')
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        todos = response.json()
 
-    # Check if the request was successful
-    if user_response.status_code != 200:
-        print(f"RequestError: {user_response.status_code}")
-        sys.exit(1)
+        user_response = requests.get(user_url)
+        user_response.raise_for_status()
+        user_info = user_response.json()
+        employee_name = user_info.get('name')
 
-    user_data = user_response.json()
-    employee_name = user_data.get('name', '')
+        if not todos:
+            print(f"No data found for employee ID: {employee_id}")
+            return
 
-    # Get user's todos
-    todos_response = requests.get(f'{base_url}/todos?userId={employee_id}')
+        csv_filename = f"{employee_id}.csv"
+        with open(csv_filename, mode='w', newline='') as csv_file:
+            fieldnames = ['USER_ID', 'USERNAME', 'TASK_COMPLETED_STATUS',
+                          'TASK_TITLE']
+            writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
 
-    # Check if the request was successful
-    if todos_response.status_code != 200:
-        print(f"RequestError: {todos_response.status_code}")
-        sys.exit(1)
+            writer.writeheader()
+            for todo in todos:
+                writer.writerow({
+                    'USER_ID': employee_id,
+                    'USERNAME': employee_name,
+                    'TASK_COMPLETED_STATUS': str(todo['completed']),
+                    'TASK_TITLE': todo['title']
+                })
 
-    todos_data = todos_response.json()
+        print(f"Data exported to {csv_filename}")
 
-    # Check if tasks were found for the user ID
-    if not todos_data:
-        print("No tasks found for user ID", employee_id)
-        sys.exit(1)
-
-    # Write data to CSV file
-    filename = f"{employee_id}.csv"
-    with open(filename, 'w', newline='') as csvfile:
-        csv_writer = csv.writer(csvfile)
-        csv_writer.writerow(["USER_ID", "USERNAME",
-                             "TASK_COMPLETED_STATUS",
-                             "TASK_TITLE"])
-        for todo in todos_data:
-            csv_writer.writerow([
-                employee_id,
-                employee_name,
-                str(todo.get('completed', False)),
-                todo.get('title', '')
-            ])
-
-    print(f"Task data exported to '{filename}' successfully.")
+    except requests.exceptions.RequestException as e:
+        print(f"Error: {e}")
 
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print("Usage: python3 1-export_to_CSV.py <employee_id>")
+        print("Usage: {} <employee_id>".format(sys.argv[0]))
         sys.exit(1)
 
-    employee_id = int(sys.argv[1])
-    export_to_csv(employee_id)
+    try:
+        employee_id = int(sys.argv[1])
+    except ValueError:
+        print("Invalid employee ID. Please provide an integer.")
+        sys.exit(1)
+
+    get_employee_todo_progress(employee_id)
